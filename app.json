@@ -23,7 +23,11 @@
       "edgeToEdgeEnabled": true
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "display": "standalone",
+      "backgroundColor": "#000000",
+      "themeColor": "#2E3192"
     }
   }
 }
