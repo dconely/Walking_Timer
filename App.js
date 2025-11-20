@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Platform, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -8,8 +8,8 @@ import { StatusBar } from 'expo-status-bar';
 
 // Constants
 const INTERVAL_TIME = 3 * 60; // 3 minutes in seconds
-const APP_VERSION = '1.0';
-const BUILD_DATE = '2025-11-19';
+const APP_VERSION = '1.1';
+const BUILD_DATE = '2025-11-20';
 
 const THEME = {
   slow: {
@@ -36,6 +36,7 @@ export default function App() {
   const [isActive, setIsActive] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [sound, setSound] = useState();
+  const endTimeRef = useRef(null);
 
   useEffect(() => {
     // Configure Audio for iOS/Web to play even in silent mode/background
@@ -79,8 +80,12 @@ export default function App() {
     let interval = null;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
+        if (endTimeRef.current) {
+          const now = Date.now();
+          const remaining = Math.ceil((endTimeRef.current - now) / 1000);
+          setTimeLeft(remaining > 0 ? remaining : 0);
+        }
+      }, 200);
     } else if (timeLeft === 0) {
       handleTimerComplete();
     }
@@ -93,11 +98,17 @@ export default function App() {
       setIsTransitioning(false);
       switchInterval();
       await playSound('start'); // Sound at start of new interval
+      if (isActive) {
+        endTimeRef.current = Date.now() + INTERVAL_TIME * 1000;
+      }
     } else {
       // Interval finished, start transition
       await playSound('end'); // Sound at end of interval
       setIsTransitioning(true);
       setTimeLeft(5); // 5 second pause
+      if (isActive) {
+        endTimeRef.current = Date.now() + 5 * 1000;
+      }
     }
   };
 
@@ -112,6 +123,9 @@ export default function App() {
     if (!isActive) {
       // User is starting the timer. Play sound to acknowledge AND unlock audio context for browsers.
       await playSound('start');
+      endTimeRef.current = Date.now() + timeLeft * 1000;
+    } else {
+      endTimeRef.current = null;
     }
     setIsActive(!isActive);
   };
