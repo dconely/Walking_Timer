@@ -8,7 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 
 // Constants
 const INTERVAL_TIME = 3 * 60; // 3 minutes in seconds
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.1.0';
 const BUILD_DATE = '2025-11-20';
 
 const THEME = {
