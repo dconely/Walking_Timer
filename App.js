@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, Dimensions, Vibration } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutUp, withSpring, useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
@@ -50,6 +50,9 @@ export default function App() {
   async function playSound(type = 'start') {
     try {
       console.log('Playing sound...', type);
+      // Vibrate before playing sound
+      Vibration.vibrate();
+
       const { sound } = await Audio.Sound.createAsync(require('./assets/beep.mp3'));
       setSound(sound);
 
